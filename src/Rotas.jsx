@@ -16,49 +16,49 @@ function Rotas() {
             <Route path="/" element={ <FormLogin/> } />
 
             <Route
-                    path="/home"
-                    element={
-                    <ProtectedRoute>
-                        <Home />
-                    </ProtectedRoute>
-                    }
-                />
+                path="/home"
+                element={
+                <ProtectedRoute>
+                    <Home />
+                </ProtectedRoute>
+                }
+            />
                 
-                <Route
-                    path="/list-cliente"
-                    element={
+            <Route
+                path="/list-cliente"
+                element={
                     <ProtectedRoute>
                         <ListCliente />
                     </ProtectedRoute>
-                    }
-                />
+                }
+            />
 
-                <Route
-                    path="/form-cliente"
-                    element={
-                    <ProtectedRoute>
-                        <FormCliente />
-                    </ProtectedRoute>
-                    }
-                />
+            <Route
+                path="/form-cliente"
+                element={
+                <ProtectedRoute>
+                    <FormCliente />
+                </ProtectedRoute>
+                }
+            />
 
-                <Route
-                    path="/list-produto"
-                    element={
-                    <ProtectedRoute>
-                        <ListProduto />
-                    </ProtectedRoute>
-                    }
-                />
+            <Route
+                path="/list-produto"
+                element={
+                <ProtectedRoute>
+                    <ListProduto />
+                </ProtectedRoute>
+                }
+            />
 
-                <Route
-                    path="/form-produto"
-                    element={
-                    <ProtectedRoute>
-                        <FormProduto />
-                    </ProtectedRoute>
-                    }
-                />
+            <Route
+                path="/form-produto"
+                element={
+                <ProtectedRoute>
+                    <FormProduto />
+                </ProtectedRoute>
+                }
+            />
 
         </Routes>
     )
