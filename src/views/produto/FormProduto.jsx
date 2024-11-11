@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import axios from 'axios';
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button, Container, Divider, Form, Icon } from 'semantic-ui-react';
 import MenuSistema from '../../MenuSistema';
@@ -17,10 +18,63 @@ export default function FormProduto () {
 	const [listaCategoria, setListaCategoria] = useState([]);
 	const [idCategoria, setIdCategoria] = useState();
 
+	useEffect(() => {
+
+		if (state != null && state.id != null) {
+
+			axios.get("http://localhost:8080/api/produto/" + state.id)
+			.then((response) => {
+				setIdProduto(response.data.id)
+				setCodigo(response.data.codigo)
+				setTitulo(response.data.titulo)
+				setDescricao(response.data.descricao)
+				setValorUnitario(response.data.valorUnitario)
+				setTempoEntregaMinimo(response.data.tempoEntregaMinimo)
+				setTempoEntregaMaximo(response.data.tempoEntregaMaximo)
+				setIdCategoria(response.data.categoria.id)
+			})
+		}
+
+		axios.get("http://localhost:8080/api/categoriaproduto")
+		.then((response) => {
+
+			const dropDownCategorias = response.data.map(c => ({ text: c.descricao, value: c.id }));
+			setListaCategoria(dropDownCategorias);
+		})
+
+	}, [state])
+
+	function salvar() {
+
+		let produtoRequest = {
+
+			idCategoria: idCategoria,
+			codigo: codigo,
+			titulo: titulo,
+			descricao: descricao,
+			valorUnitario: valorUnitario,
+			tempoEntregaMinimo: tempoEntregaMinimo,
+			tempoEntregaMaximo: tempoEntregaMaximo
+		}
+
+		if (idProduto != null) { //Alteração:
+
+			axios.put("http://localhost:8080/api/produto/" + idProduto, produtoRequest)
+			.then((response) => { console.log('Produto alterado com sucesso.') })
+			.catch((error) => { console.log('Erro ao alterar um produto.') })
+
+		} else { //Cadastro:
+
+			axios.post("http://localhost:8080/api/produto", produtoRequest)
+			.then((response) => { console.log('Produto cadastrado com sucesso.') })
+			.catch((error) => { console.log('Erro ao incluir o produto.') })
+		}
+	}
+
 	return(
 		<div>
 
-			<MenuSistema tela={'produto'} />
+			<MenuSistema />
 
 			<div style={{marginTop: '3%'}}>
 
@@ -143,6 +197,7 @@ export default function FormProduto () {
 									color='blue'
 									icon='save'
 									floated='right'
+									onClick={() => salvar()}
 								/>
 
 							</Form.Group>

@@ -1,36 +1,78 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import InputMask from 'react-input-mask';
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button, Container, Divider, Form, Icon } from 'semantic-ui-react';
 import MenuSistema from '../../MenuSistema';
 
 export default function FormCliente () {
 
+    const { state } = useLocation();
+    const [idCliente, setIdCliente] = useState();
     const [nome, setNome] = useState();
     const [cpf, setCpf] = useState();
     const [dataNascimento, setDataNascimento] = useState();
     const [foneCelular, setFoneCelular] = useState();
     const [foneFixo, setFoneFixo] = useState();
 
+    useEffect(() => {
+
+        if (state != null && state.id != null) {
+
+            axios.get("http://localhost:8080/api/cliente/" + state.id)
+            .then((response) => {
+                setIdCliente(response.data.id)
+                setNome(response.data.nome)
+                setCpf(response.data.cpf)
+                setDataNascimento(response.data.dataNascimento)
+                setFoneCelular(response.data.foneCelular)
+                setFoneFixo(response.data.foneFixo)
+            })
+        }
+
+    }, [state])
+
     function salvar() {
 
-		let clienteRequest = {
+        let clienteRequest = {
             nome: nome,
             cpf: cpf,
             dataNascimento: dataNascimento,
             foneCelular: foneCelular,
             foneFixo: foneFixo
-		}
-	
-		axios.post("http://localhost:8080/api/cliente", clienteRequest)
-		.then((response) => {
-		    console.log('Cliente cadastrado com sucesso.')
-		})
-		.catch((error) => {
-		    console.log('Erro ao incluir o um cliente.')
-		})
-	}
+        }
+ 
+        if (idCliente != null) { //Alteração:
+
+            axios.put("http://localhost:8080/api/cliente/" + idCliente, clienteRequest)
+            .then((response) => { 
+                console.log('Cliente alterado com sucesso.') 
+            })
+            .catch((error) => { 
+                console.log('Erro ao alter um cliente.') 
+            })
+
+        } else { //Cadastro:
+
+            axios.post("http://localhost:8080/api/cliente", clienteRequest)
+            .then((response) => { 
+                console.log('Cliente cadastrado com sucesso.') 
+            })
+            .catch((error) => { 
+                console.log('Erro ao incluir o cliente.') 
+            })
+        }
+    }
+ 
+    function formatarData(dataParam) {
+
+        if (dataParam === null || dataParam === '' || dataParam === undefined) {
+            return ''
+        }
+
+        let arrayData = dataParam.split('-');
+        return arrayData[2] + '/' + arrayData[1] + '/' + arrayData[0];
+    }
 
     return (
 
@@ -42,7 +84,12 @@ export default function FormCliente () {
 
                 <Container textAlign='justified' >
 
-                    <h2> <span style={{color: 'darkgray'}}> Cliente &nbsp;<Icon name='angle double right' size="small" /> </span> Cadastro </h2>
+                    { idCliente === undefined &&
+                        <h2> <span style={{color: 'darkgray'}}> Cliente &nbsp;<Icon name='angle double right' size="small" /> </span> Cadastro</h2>
+                    }
+                    { idCliente != undefined &&
+                        <h2> <span style={{color: 'darkgray'}}> Cliente &nbsp;<Icon name='angle double right' size="small" /> </span> Alteração</h2>
+                    }
 
                     <Divider />
 
@@ -108,7 +155,7 @@ export default function FormCliente () {
                                         mask="99/99/9999" 
                                         maskChar={null}
                                         placeholder="Ex: 20/03/1985"
-                                        value={dataNascimento}
+                                        value={formatarData(dataNascimento)}
 				                        onChange={e => setDataNascimento(e.target.value)}
                                     /> 
                                 </Form.Input>

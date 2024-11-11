@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import InputMask from 'react-input-mask';
 import { Link, useLocation } from "react-router-dom";
 import { Button, Container, Divider, Form, Icon } from 'semantic-ui-react';
@@ -44,10 +45,90 @@ export default function FormEntregador () {
 	const [enderecoComplemento, setEnderecoComplemento] = useState();
 	const [ativo, setAtivo] = useState(true);
 
+	useEffect(() => {
+
+		if (state != null && state.id != null) {
+
+			axios.get("http://localhost:8080/api/entregador/" + state.id)
+
+			.then((response) => {
+
+				setIdEntregador(response.data.id)
+				setNome(response.data.nome)
+				setCpf(response.data.cpf)
+				setRg(response.data.rg)
+				setDataNascimento(formatarData(response.data.dataNascimento))
+				setFoneCelular(response.data.foneCelular)
+				setFoneFixo(response.data.foneFixo)
+				setQtdEntregasRealizadas(response.data.qtdEntregasRealizadas)
+				setValorFrete(response.data.valorFrete)
+				setEnderecoRua(response.data.enderecoRua)
+				setEnderecoNumero(response.data.enderecoNumero)
+				setEnderecoBairro(response.data.enderecoBairro)
+				setEnderecoCep(response.data.enderecoCep)
+				setEnderecoCidade(response.data.enderecoCidade)
+				setEnderecoEstado(response.data.enderecoUf)
+				setEnderecoComplemento(response.data.enderecoComplemento)
+				setAtivo(response.data.ativo)
+			})
+		}
+
+	}, [state])
+
+	function formatarData(dataParam) {
+
+        if (dataParam === null || dataParam === '') {
+            return ''
+        }
+        
+        let dia = dataParam.substr(8,2);
+        let mes = dataParam.substr(5,2);
+        let ano = dataParam.substr(0,4);
+        let dataFormatada = dia + '/' + mes + '/' + ano;
+
+        return dataFormatada
+    }
+
+	function salvar() {
+
+		let entregadorRequest = {
+
+			nome: nome,
+			cpf: cpf,
+			rg: rg,
+			dataNascimento: dataNascimento,
+			foneCelular: foneCelular,
+			foneFixo: foneFixo,
+			qtdEntregasRealizadas: parseInt(qtdEntregasRealizadas),
+			valorFrete: parseFloat(valorFrete),
+			enderecoRua: enderecoRua,
+			enderecoNumero: enderecoNumero,
+			enderecoBairro: enderecoBairro,
+			enderecoCep: enderecoCep,
+			enderecoCidade: enderecoCidade,
+			enderecoUf: enderecoEstado,
+			enderecoComplemento: enderecoComplemento,
+			ativo: ativo
+		}
+
+		if (idEntregador != null) { //Alteração:
+
+			axios.put("http://localhost:8080/api/entregador/" + idEntregador, entregadorRequest)
+			.then((response) => { console.log('Entregador alterado com sucesso.') })
+			.catch((error) => { console.log('Erro ao alter um Entregador.') })
+
+		} else { //Cadastro:
+			
+			axios.post("http://localhost:8080/api/entregador", entregadorRequest)
+			.then((response) => { console.log('Entregador cadastrado com sucesso.') })
+			.catch((error) => { console.log('Erro ao incluir o Entregador.') })
+		}
+	}
+
 	return(
 		<div>
 
-			<MenuSistema tela={'entregador'} />
+			<MenuSistema />
 
 			<div style={{marginTop: '3%'}}>
 
@@ -268,6 +349,7 @@ export default function FormEntregador () {
 										labelPosition='left'
 										color='blue'
 										floated='right'
+										onClick={() => salvar()}
 									>
 										<Icon name='save' />
 										Salvar
