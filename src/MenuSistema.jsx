@@ -13,7 +13,7 @@ export default function MenuSistema (props) {
                    content='Home'
                    active={props.tela === 'home'}
                    as={Link}
-                   to='/'
+                   to='/home'
                />
 
                <Menu.Item

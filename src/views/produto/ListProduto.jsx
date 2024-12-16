@@ -76,38 +76,43 @@ export default function ListProduto () {
             setMenuFiltro(true);
         }
     }
-
+ 
     function handleChangeCodigo(value) {
-
-        setCodigo(value);
-        filtrarProdutos();
+ 
+        filtrarProdutos(value, titulo, idCategoria);
     }
-
+ 
     function handleChangeTitulo(value) {
-
-        setTitulo(value);
-        filtrarProdutos();
+ 
+        filtrarProdutos(codigo, value, idCategoria);
     }
-
+ 
     function handleChangeCategoriaProduto(value) {
-
-        setIdCategoria(value);
-        filtrarProdutos();
+ 
+        filtrarProdutos(codigo, titulo, value);
     }
 
-    function filtrarProdutos() {
+    async function filtrarProdutos(codigoParam, tituloParam, idCategoriaParam) {
 
         let formData = new FormData();
-
-        formData.append('codigo', codigo);
-        formData.append('titulo', titulo);
-        formData.append('idCategoria', idCategoria);
-
-        axios.post("http://localhost:8080/api/produto/filtrar", formData)
+ 
+        if (codigoParam !== undefined) {
+            setCodigo(codigoParam)
+            formData.append('codigo', codigoParam);
+        }
+        if (tituloParam !== undefined) {
+            setTitulo(tituloParam)
+            formData.append('titulo', tituloParam);
+        }
+        if (idCategoriaParam !== undefined) {
+            setIdCategoria(idCategoriaParam)
+            formData.append('idCategoria', idCategoriaParam);
+        }
+ 
+        await axios.post("http://localhost:8080/api/produto/filtrar", formData)
         .then((response) => {
             setListaProdutos(response.data)
         })
-    
     }
 
     return (
@@ -147,7 +152,7 @@ export default function ListProduto () {
                             to='/form-produto'
                         />
 
-                        { menuFiltro ?
+{ menuFiltro ?
                             
                             <Segment>
                                 <Form className="form-filtros">
@@ -155,36 +160,36 @@ export default function ListProduto () {
                                     <Form.Input
                                         icon="search"
                                         value={codigo}
-                                        onChange={() => handleChangeCodigo()}
+                                        onChange={e => handleChangeCodigo(e.target.value)}
                                         label='Código do Produto'
                                         placeholder='Filtrar por Código do Produto'
                                         labelPosition='left'
                                         width={4}
                                     />
-                                    
-                                    <Form.Group widths='equal'> 
-                                    
-                                        <Form.Input
-                                            icon="search"
-                                            value={titulo}
-                                            onChange={() => handleChangeTitulo()}
-                                            label='Título'
-                                            placeholder='Filtrar por título'
-                                            labelPosition='left'
-                                        />
-                                        
-                                        <Form.Select
-                                            placeholder='Filtrar por Categoria'
-                                            label='Categoria'
-                                            options={listaCategoriaProduto}
-                                            value={idCategoria}
-                                            onChange={() => handleChangeCategoriaProduto()}
-                                        />
-                                        
-                                    </Form.Group>
-                                </Form>
-                            </Segment>:""
-                        }
+                        
+                        <Form.Group widths='equal'>                   
+                            <Form.Input
+                                icon="search"
+                                value={titulo}
+                                onChange={e => handleChangeTitulo(e.target.value)}
+                                label='Título'
+                                placeholder='Filtrar por título'
+                                labelPosition='left'
+                            />
+                            <Form.Select
+                                placeholder='Filtrar por Categoria'
+                                label='Categoria'
+                                options={listaCategoriaProduto}
+                                value={idCategoria}
+                                onChange={(e,{value}) => {
+            handleChangeCategoriaProduto(value)
+                                                    }}
+                            />
+                            
+                        </Form.Group>
+                    </Form>
+                </Segment>:""
+            }
 
                         <br/><br/>
                     
